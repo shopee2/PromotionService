@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +33,7 @@ import com.google.gson.JsonObject;
 import shopee2.model.Promotion;
 import shopee2.pormotionService.FirebaseInit;
 
+@CrossOrigin
 @ComponentScan(basePackages="shopee2.pormotionService")
 @RestController
 public class Controller {
@@ -60,7 +62,7 @@ public class Controller {
 				System.out.println(new DateTime(new Long("1605891600000"), 420));
 			*/
 			p.setId(doc.getLong("id").intValue());
-			p.setDesc(doc.getString("description"));
+			p.setDesc(doc.getString("desc"));
 			p.setProductNo(doc.getString("productNo"));
 			p.setForShopID(doc.getString("forShopID"));
 			p.setCreatorID(doc.getString("creatorID"));
@@ -106,6 +108,20 @@ public class Controller {
 		promotionList = docToList(promotionList, querySnapshot);
 		
 		return promotionList;
+
+	}
+	
+	@RequestMapping(value = "/promotions/id/{id}", method=RequestMethod.GET)
+	public Promotion getPromotionFreeDelivery (@PathVariable int id ) throws InterruptedException, ExecutionException {
+		List<Promotion> promotionList = new ArrayList<Promotion>();
+		CollectionReference Promotion = db.getFireBase().collection("promotion");
+		Query promotionSearch = Promotion.whereEqualTo("id", id);
+		System.out.println("recieve data");
+		ApiFuture<QuerySnapshot> querySnapshot= promotionSearch.get();
+		
+		promotionList = docToList(promotionList, querySnapshot);
+		
+		return promotionList.get(0);
 
 	}
 	
@@ -185,7 +201,7 @@ public class Controller {
 			return "success\n"+p.getId();
 		}
 		else {
-			return "ERROR : This code has been used";
+			return "{\'ERROR\' : \'This code has been used\'}";
 		}
 	}
 	@RequestMapping(value = "/promotions", method=RequestMethod.PATCH)

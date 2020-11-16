@@ -10,7 +10,7 @@ import com.google.cloud.firestore.Firestore;
 @Component
 public class Promotion {
 	private int id;
-	private String description;
+	private String desc;
 	private String productNo;
 	private String forShopID;
 	private String creatorID;
@@ -33,11 +33,11 @@ public class Promotion {
 	}
 
 	public String getDesc() {
-		return description;
+		return desc;
 	}
 
 	public void setDesc(String desc) {
-		this.description = desc;
+		this.desc = desc;
 	}
 
 	public String getProductNo() {
