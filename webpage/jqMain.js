@@ -1,6 +1,6 @@
 
 $(document).ready(function(){
-    callAllPromotion()
+    callPromotion()
     $("#regisForm").submit(function(e){
         e.preventDefault();
         //console.log("nah")
@@ -36,32 +36,43 @@ $(document).ready(function(){
             startDate: ""
             type: "active"
         */
-        console.log($('#registerModal').data("registerModalState"));
+        console.log($('#registerModal').data("registermodalstate"));
         var url = ""
         var method = ""
-        if($('#registerModal').data("registerModalState")==="regis"){
+        if($('#registerModal').data("registermodalstate")=="regis"){
             url = 'http://localhost:8089/promotions'
             method = "POST"
         }
-        else if ($('#registerModal').data("registerModalState")==="edit"){
+        else if ($('#registerModal').data("registermodalstate")=="edit"){
             url = 'http://localhost:8089/promotions?id='+$('#registerModal').data("couponId")
             method = "PATCH"
 
         }
+        console.log("Before")
+        console.log(url, method)
         $.ajax({
             url: url,
             type: method,
             data: JSON.stringify(data),
             contentType: 'application/json'
-         }).then((setTimeout (function(data){
-
+         }).then(function(data){
+            console.log("RESPONSE")
             //ถ้าสำเร็จ
-            $(".cardInstant").remove();
-            setTimeout(callAllPromotion(), 100000);
             console.log(data)
-            $('#registerModal').data("registerModalState", "regis")
-            $('#registerModal').modal('hide')
-        }, 500)))
+            if(data['status'] == 'success'){
+                
+                $(".cardInstant").remove();
+                setTimeout(callPromotion(), 100000);
+                console.log("OK")
+                $('#registerModal').data("registerModalState", "regis")
+                $('#registerModal').modal('hide')
+            }
+            else if(data['status'] === 'error'){
+                console.log("error")
+                $('#usedCodeError').css('display', 'inline-block');
+            }
+            
+        })
         });
 
     $('#registerModal').on('hidden.bs.modal', function (e) {
@@ -70,15 +81,15 @@ $(document).ready(function(){
 
 });
 
-function swapPros(id, active){
+
+function swapPros(id, active, free){
     $.ajax({
         url: 'http://localhost:8089/promotions?id='+id,
         type: 'PATCH',
         data: JSON.stringify({'active':!active}),
         contentType: 'application/json'
      }).then(setTimeout (function(data){
-        $(".cardInstant").remove();
-        setTimeout(callAllPromotion());
+        callPromotion(free)
      }, 500))
 }
 
@@ -87,7 +98,7 @@ function deletePros(id){
         url: 'http://localhost:8089/promotions?id='+id,
         type: 'DELETE',
      }).then(setTimeout (function(data){
-        setTimeout(callAllPromotion());
+        setTimeout(callPromotion());
         $(".cardInstant").remove();
      }, 500))
 }
@@ -111,17 +122,18 @@ function editPros(id, active){
         url: 'http://localhost:8089/promotions/id/'+id,
         type: 'GET',
      }).then(function(data){
+        var promotion = data['promotion']
         console.log($('#freeDeliCheck').val())
         $('#registerModal').modal('toggle')
-        $('#freeDeliCheck').prop('checked', data['isFreeDelivery'])
-        $('#type').get(0).selectedIndex = data['active']?0:1
-        $('#discountCode').val(data["code"])
-        $('#couponDesc').val(data['desc'])
-        $('#minPrice').val(data['minimumPrice'])
-        $('#discountBaht').val(data['discountInPrice']===0?"":data['discountInPrice'])
-        $('#discountPercent').val(data['discountInPercent']===0?"":data['discountInPercent'])
-        $('#startDate').val($.format.date(new Date(data['startDate']), "yyyy-MM-ddTH:mm:ss"))
-        $('#dueDate').val($.format.date(new Date(data['dueDate']), "yyyy-MM-ddTH:mm:ss"))
+        $('#freeDeliCheck').prop('checked', promotion['isFreeDelivery'])
+        $('#type').get(0).selectedIndex = promotion['active']?0:1
+        $('#discountCode').val(promotion["code"])
+        $('#couponDesc').val(promotion['desc'])
+        $('#minPrice').val(promotion['minimumPrice'])
+        $('#discountBaht').val(promotion['discountInPrice']===0?"":promotion['discountInPrice'])
+        $('#discountPercent').val(promotion['discountInPercent']===0?"":promotion['discountInPercent'])
+        $('#startDate').val($.format.date(new Date(promotion['startDate']), "yyyy-MM-ddTH:mm:ss"))
+        $('#dueDate').val($.format.date(new Date(promotion['dueDate']), "yyyy-MM-ddTH:mm:ss"))
 
 
         if($('#freeDeliCheck').prop('checked') == true){
@@ -165,25 +177,26 @@ function clearModal(){
     $('#discountPercent').val("")
     $('#startDate').val("")
     $('#dueDate').val("")
+    $('#usedCodeError').css('display', 'none');
 }
 
 
 
 
-function callAllPromotion(free){
+function callPromotion(free){
     $(".cardInstant").remove();
     var url = free?"http://localhost:8089/promotions/freeDelivery":"http://localhost:8089/promotions";
     $.ajax({
         url: url,
     }).then(function(data) {
         console.log(data);
-        renderPromotion(data);
+        renderPromotion(data, free);
     });
 
 }
 
-function renderPromotion(data){
-    $.each(data, function(index, value){
+function renderPromotion(data, free){
+    $.each(data['promotion'], function(index, value){
         var card = "";
         card += "<div class=\"card col-lg-3 ml-5 mb-2 cardInstant\" style=\"width: 18rem;\"><div class=\"card-body\">"
         if (value.desc != null) {
@@ -192,12 +205,12 @@ function renderPromotion(data){
         else{
             card += "<h5 class=\"card-text\">ไม่มีคำอธิบาย</h5>"
         }
-        card += "<h5 class=\"card-text\">code : "+value.code+"</h5>"
-        card += "<h5 class=\"card-text\">start : "+$.format.date(new Date(value.startDate), "d/MM/yyyy H:mm:ss")+"</h5>"
-        card += "<h5 class=\"card-text\">end : "+$.format.date(new Date(value.dueDate), "d/MM/yyyy H:mm:ss")+"</h5>"
+        card += "<h5 class=\"card-text\">Code : "+value.code+"</h5>"
+        card += "<h5 class=\"card-text\">Start : "+$.format.date(new Date(value.startDate), "d/MM/yyyy H:mm:ss")+"</h5>"
+        card += "<h5 class=\"card-text\">End : "+$.format.date(new Date(value.dueDate), "d/MM/yyyy H:mm:ss")+"</h5>"
         card += "<h5 class=\"card-text\">Minimum Price : "+value.minimumPrice+" Baht</h5>"
         if (value.isFreeDelivery == true){
-            card += "<h5 class=\"card-text\">Free delivery</h5>"
+            card += "<h5 class=\"card-text text-primary\">Free delivery</h5>"
         }
         else{
             
@@ -209,8 +222,8 @@ function renderPromotion(data){
             }
         }
         card += (value.active)?"<h5 class=\"card-text\">Status : <span class='text-success'>Active</span></h5>":"<h5 class=\"card-text\">Status : <span class='text-danger'>Inactive</span></h5>";
-        card += "<button class=\"btn btn-primary\" onclick=\"swapPros("+value.id+", "+value.active+")\">swap</button>"
-        card += "<button class=\"btn btn-warning\" onclick=\"editPros("+value.id+", "+value.active+")\">edit</button>"
+        card += "<button class=\"btn btn-primary\" onclick=\"swapPros("+value.id+", "+value.active+", "+free+")\">swap</button>"
+        card += "<button class=\"btn btn-warning\" onclick=\"editPros("+value.id+", "+value.active+", "+free+")\">edit</button>"
         card += "<button class=\"btn btn-danger\" onclick=\"deletePros("+value.id+")\">Delete</button>"
         card += "</div>"
         

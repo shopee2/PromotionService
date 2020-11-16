@@ -2,7 +2,9 @@ package shopee2.controller;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,20 +87,25 @@ public class Controller {
 	
 	
 	@RequestMapping(value = "/promotions", method=RequestMethod.GET)
-	public List<Promotion> getPromotion() throws InterruptedException, ExecutionException {
+	public Map<String, Object> getPromotion() throws InterruptedException, ExecutionException, JsonProcessingException {
 		List<Promotion> promotionList = new ArrayList<Promotion>();
 		CollectionReference Promotion = db.getFireBase().collection("promotion");
 		System.out.println("recieve data");
 		ApiFuture<QuerySnapshot> querySnapshot= Promotion.get();
 		
 		promotionList = docToList(promotionList, querySnapshot);
+		Map<String, Object> status = new HashMap<String, Object>();
+		status.put( "status", "success" );
+		status.put( "description", "get all promotion success" );
+		status.put( "promotion", promotionList);
 		
-		return promotionList;
+		return status;
+		
 
 	}
 	
 	@RequestMapping(value = "/promotions/freeDelivery", method=RequestMethod.GET)
-	public List<Promotion> getPromotionFreeDelivery() throws InterruptedException, ExecutionException {
+	public Map<String, Object> getPromotionFreeDelivery() throws InterruptedException, ExecutionException {
 		List<Promotion> promotionList = new ArrayList<Promotion>();
 		CollectionReference Promotion = db.getFireBase().collection("promotion");
 		Query promotionSearch = Promotion.whereEqualTo("isFreeDelivery", true);
@@ -106,13 +113,18 @@ public class Controller {
 		ApiFuture<QuerySnapshot> querySnapshot= promotionSearch.get();
 		
 		promotionList = docToList(promotionList, querySnapshot);
+		Map<String, Object> status = new HashMap<String, Object>();
+		status.put( "status", "success" );
+		status.put( "description", "get free delivery promotion success" );
+		status.put( "promotion", promotionList);
 		
-		return promotionList;
+
+		return status;
 
 	}
 	
 	@RequestMapping(value = "/promotions/id/{id}", method=RequestMethod.GET)
-	public Promotion getPromotionFreeDelivery (@PathVariable int id ) throws InterruptedException, ExecutionException {
+	public Map<String, Object> getPromotionFreeDelivery (@PathVariable int id ) throws InterruptedException, ExecutionException {
 		List<Promotion> promotionList = new ArrayList<Promotion>();
 		CollectionReference Promotion = db.getFireBase().collection("promotion");
 		Query promotionSearch = Promotion.whereEqualTo("id", id);
@@ -120,13 +132,20 @@ public class Controller {
 		ApiFuture<QuerySnapshot> querySnapshot= promotionSearch.get();
 		
 		promotionList = docToList(promotionList, querySnapshot);
+		Map<String, Object> status = new HashMap<String, Object>();
+		status.put( "status", "success" );
+		status.put( "description", "get promotion success" );
+		status.put( "promotion", promotionList.get(0));
 		
-		return promotionList.get(0);
+
+		return status;
+		
+
 
 	}
 	
 	@RequestMapping(value = "/promotions/{code}", method=RequestMethod.GET)
-	public String getPromotionCodeMatch(@PathVariable String code) throws InterruptedException, ExecutionException, JsonProcessingException {
+	public Map<String, Object> getPromotionCodeMatch(@PathVariable String code) throws InterruptedException, ExecutionException, JsonProcessingException {
 		List<Promotion> promotionList = new ArrayList<Promotion>();
 		CollectionReference Promotion = db.getFireBase().collection("promotion");
 		Query promotionSearch = Promotion.whereEqualTo("code", code);
@@ -138,14 +157,22 @@ public class Controller {
 		//System.out.print(((Promotion)promotionList.get(0)).getStartDate().after(curentDAte));
 		
 		if(promotionList.size() == 0) {
-			return "{"
-					+"\"error\":\"Invaild code\""
-					+ "}";
+			Map<String, Object> status = new HashMap<String, Object>();
+			status.put( "status", "error" );
+			status.put( "description", "Invaild code" );
+			
+			return status;
 		}
 		
 		else if (!((Promotion)promotionList.get(0)).getStartDate().after(curentDAte) && !((Promotion)promotionList.get(0)).getDueDate().before(curentDAte)) {
 			try {
-				return new ObjectMapper().writeValueAsString(promotionList.get(0));
+				Map<String, Object> status = new HashMap<String, Object>();
+				status.put( "status", "success" );
+				status.put( "description", "Valid code" );
+				status.put( "promotion", promotionList.get(0));
+				
+				//return new ObjectMapper().writeValueAsString(promotionList.get(0));
+				return status;
 				//new ObjectMapper().writeValueAsString(Promotion)
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -153,19 +180,24 @@ public class Controller {
 			}
 		}
 		else {
-			return "{"
-					+"\"error\":\"is code has expired\""
-					+ "}";
+			Map<String, Object> status = new HashMap<String, Object>();
+			status.put( "status", "error" );
+			status.put( "description", "Code is expried" );
+			
+			return status;
 		}
+		Map<String, Object> status = new HashMap<String, Object>();
+		status.put( "status", "non" );
+		status.put( "description", "non" );
 		
 		
-		return "";
+		return status;
 
 	}
 
 	
 	@RequestMapping(value = "/promotions", method=RequestMethod.POST)
-	public String addPromotion(@RequestBody Promotion promotion) throws InterruptedException, ExecutionException {
+	public Map<String, Object> addPromotion(@RequestBody Promotion promotion) throws InterruptedException, ExecutionException, JsonProcessingException {
 		
 		System.out.println("start");
 		//get all to check if duplicate code
@@ -198,14 +230,22 @@ public class Controller {
 		//add
 		if (promotionList.size() == 0) {
 			PromotionGet.document(String.valueOf(p.getId())).set(p);
-			return "success\n"+p.getId();
+			Map<String, Object> status = new HashMap<String, Object>();
+			status.put( "status", "success" );
+			status.put( "description", "create promotion successfully" );
+			
+			return status;
 		}
 		else {
-			return "{\'ERROR\' : \'This code has been used\'}";
+			Map<String, Object> status = new HashMap<String, Object>();
+			status.put( "status", "error" );
+			status.put( "description", "This code has been used" );
+			
+			return status;
 		}
 	}
 	@RequestMapping(value = "/promotions", method=RequestMethod.PATCH)
-	public String updatePromotion(@RequestBody Promotion promotion, @RequestParam int id) throws InterruptedException, ExecutionException {		
+	public Map<String, Object> updatePromotion(@RequestBody Promotion promotion, @RequestParam int id) throws InterruptedException, ExecutionException, JsonProcessingException {		
 		List<Promotion> promotionList = new ArrayList<Promotion>();
 		CollectionReference PromotionGet= db.getFireBase().collection("promotion");
 		Query promotionSearch = PromotionGet.whereEqualTo("id", id);
@@ -240,21 +280,32 @@ public class Controller {
 		ApiFuture<QuerySnapshot> codeDupe2Get = codeDupe2.get();
 		if (codeDupeGet.get().getDocuments().size() == 0 && codeDupe2Get.get().getDocuments().size() == 0) {
 			PromotionGet.document(String.valueOf(id)).set(p);
-			return "success\n";
+			Map<String, Object> status = new HashMap<String, Object>();
+			status.put( "status", "success" );
+			status.put( "description", "edit promotion successfully" );
+			
+			return status;
 		}
 		else {
-			return "ERROR : This code has been used";
+			Map<String, Object> status = new HashMap<String, Object>();
+			status.put( "status", "error" );
+			status.put( "description", "This code has been used" );
+			return status;
 		}
 		
 	}
 	
 	@RequestMapping(value = "/promotions", method = RequestMethod.DELETE)
-	public String deletePromotion(@RequestParam String id) throws InterruptedException, ExecutionException {
+	public String deletePromotion(@RequestParam String id) throws InterruptedException, ExecutionException, JsonProcessingException {
 		
 		CollectionReference PromotionGet= db.getFireBase().collection("promotion");
 		System.out.println("recieve data");
 		ApiFuture<WriteResult> querySnapshot = PromotionGet.document(id).delete();
 		
-		return "success" + querySnapshot.get().getUpdateTime();
+		Map<String, String> status = new HashMap<String, String>();
+		status.put( "status", "success" );
+		status.put( "description", "Delete promotion successfully" );
+		
+		return new ObjectMapper().writeValueAsString(status);
 	}
 }
