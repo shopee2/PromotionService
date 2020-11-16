@@ -251,7 +251,7 @@ public class Controller {
 		Query promotionSearch = PromotionGet.whereEqualTo("id", id);
 		List<Promotion> listCodeDupe = new ArrayList<Promotion>();
 		
-		System.out.println("recieve data");
+		System.out.println(promotion);
 		ApiFuture<QuerySnapshot> querySnapshot= promotionSearch.get();
 		promotionList = docToList(promotionList, querySnapshot);
 		

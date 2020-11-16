@@ -18,7 +18,7 @@ $(document).ready(function(){
             "code": serializedForm['discountCode'],
             "startDate": new Date(serializedForm['startDate']).toISOString(),
             "dueDate": new Date(serializedForm['dueDate']).toISOString(),
-            "minimumPrice": serializedForm['minPrice'],
+            "minimumPrice": parseInt(serializedForm['minPrice']),
             "discountInPrice": disBaht,
             "discountInPercent": disPer,
             "isFreeDelivery": $("#freeDeliCheck")[0].checked,
@@ -44,12 +44,13 @@ $(document).ready(function(){
             method = "POST"
         }
         else if ($('#registerModal').data("registermodalstate")=="edit"){
-            url = 'http://localhost:8089/promotions?id='+$('#registerModal').data("couponId")
+            url = 'http://localhost:8089/promotions?id='+$('#registerModal').data("couponid")
             method = "PATCH"
 
         }
         console.log("Before")
         console.log(url, method)
+        console.log(data)
         $.ajax({
             url: url,
             type: method,
@@ -147,8 +148,8 @@ function editPros(id, active){
             $( "#discountPercent" ).prop( "disabled", false );
         }
 
-        $('#registerModal').data("registerModalState", "edit")
-        $('#registerModal').data("couponId", id)
+        $('#registerModal').data("registermodalstate", "edit")
+        $('#registerModal').data("couponid", id)
 
      })
      /*
