@@ -1,6 +1,8 @@
 
 $(document).ready(function(){
     callPromotion()
+
+    //when submit register/edit form
     $("#regisForm").submit(function(e){
         e.preventDefault();
         //console.log("nah")
@@ -44,7 +46,7 @@ $(document).ready(function(){
             method = "POST"
         }
         else if ($('#registerModal').data("registermodalstate")=="edit"){
-            url = 'http://localhost:8089/promotions?id='+$('#registerModal').data("couponid")
+            url = 'http://localhost:8089/promotions/edit/'+$('#registerModal').data("couponid")
             method = "PATCH"
 
         }
@@ -63,7 +65,7 @@ $(document).ready(function(){
             if(data['status'] == 'success'){
                 
                 $(".cardInstant").remove();
-                setTimeout(callPromotion(), 100000);
+                callPromotion()
                 console.log("OK")
                 $('#registerModal').data("registerModalState", "regis")
                 $('#registerModal').modal('hide')
@@ -76,16 +78,44 @@ $(document).ready(function(){
         })
         });
 
+        $('.selectProduct').select2();
+
     $('#registerModal').on('hidden.bs.modal', function (e) {
         clearModal()
+        $('#registerModal').data("registerModalState", "regis")
       })
+
+    var dummy_data_product = [
+        {
+            'id':01,
+            'name':'Tesla Model X',
+            'description':'Electric car',
+            'imageUrl':'url',
+            'weight':999,
+            'price':3099.99,
+            'stock':100,
+            'shopId':35,
+            'categoryId':39,
+        },
+        {
+            'id':02,
+            'name':'Tesla Model Y',
+            'description':'Electric car',
+            'imageUrl':'url',
+            'weight':999,
+            'price':2099.99,
+            'stock':100,
+            'shopId':35,
+            'categoryId':39,
+        },
+    ]
 
 });
 
 
 function swapPros(id, active, free){
     $.ajax({
-        url: 'http://localhost:8089/promotions?id='+id,
+        url: 'http://localhost:8089/promotions/edit/'+id,
         type: 'PATCH',
         data: JSON.stringify({'active':!active}),
         contentType: 'application/json'
@@ -96,7 +126,7 @@ function swapPros(id, active, free){
 
 function deletePros(id){
     $.ajax({
-        url: 'http://localhost:8089/promotions?id='+id,
+        url: 'http://localhost:8089//promotions/delete/'+id,
         type: 'DELETE',
      }).then(setTimeout (function(data){
         setTimeout(callPromotion());
@@ -223,9 +253,9 @@ function renderPromotion(data, free){
             }
         }
         card += (value.active)?"<h5 class=\"card-text\">Status : <span class='text-success'>Active</span></h5>":"<h5 class=\"card-text\">Status : <span class='text-danger'>Inactive</span></h5>";
-        card += "<button class=\"btn btn-primary\" onclick=\"swapPros("+value.id+", "+value.active+", "+free+")\">swap</button>"
-        card += "<button class=\"btn btn-warning\" onclick=\"editPros("+value.id+", "+value.active+", "+free+")\">edit</button>"
-        card += "<button class=\"btn btn-danger\" onclick=\"deletePros("+value.id+")\">Delete</button>"
+        card += "<button class=\"btn btn-primary mr-2\" onclick=\"swapPros("+value.id+", "+value.active+", "+free+")\">swap</button>"
+        card += "<button class=\"btn btn-warning mr-2\" onclick=\"editPros("+value.id+", "+value.active+", "+free+")\">edit</button>"
+        card += "<button class=\"btn btn-danger mr-2\" onclick=\"deletePros("+value.id+")\">Delete</button>"
         card += "</div>"
         
         $( ".cardCont" ).append(card);

@@ -182,7 +182,7 @@ public class Controller {
 		else {
 			Map<String, Object> status = new HashMap<String, Object>();
 			status.put( "status", "error" );
-			status.put( "description", "Code is expried" );
+			status.put( "description", "Code has exprired" );
 			
 			return status;
 		}
@@ -244,8 +244,8 @@ public class Controller {
 			return status;
 		}
 	}
-	@RequestMapping(value = "/promotions", method=RequestMethod.PATCH)
-	public Map<String, Object> updatePromotion(@RequestBody Promotion promotion, @RequestParam int id) throws InterruptedException, ExecutionException, JsonProcessingException {		
+	@RequestMapping(value = "/promotions/edit/{id}", method=RequestMethod.PATCH)
+	public Map<String, Object> updatePromotion(@RequestBody Promotion promotion, @PathVariable int id) throws InterruptedException, ExecutionException, JsonProcessingException {		
 		List<Promotion> promotionList = new ArrayList<Promotion>();
 		CollectionReference PromotionGet= db.getFireBase().collection("promotion");
 		Query promotionSearch = PromotionGet.whereEqualTo("id", id);
@@ -295,8 +295,8 @@ public class Controller {
 		
 	}
 	
-	@RequestMapping(value = "/promotions", method = RequestMethod.DELETE)
-	public String deletePromotion(@RequestParam String id) throws InterruptedException, ExecutionException, JsonProcessingException {
+	@RequestMapping(value = "/promotions/delete/{id}", method = RequestMethod.DELETE)
+	public String deletePromotion(@PathVariable String id) throws InterruptedException, ExecutionException, JsonProcessingException {
 		
 		CollectionReference PromotionGet= db.getFireBase().collection("promotion");
 		System.out.println("recieve data");
