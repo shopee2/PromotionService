@@ -11,7 +11,7 @@ import com.google.cloud.firestore.Firestore;
 public class Promotion {
 	private int id;
 	private String desc;
-	private String productNo;
+	private int productNo;
 	private String forShopID;
 	private String creatorID;
 	private Boolean active;
@@ -40,11 +40,11 @@ public class Promotion {
 		this.desc = desc;
 	}
 
-	public String getProductNo() {
+	public int getProductNo() {
 		return productNo;
 	}
 
-	public void setProductNo(String productNo) {
+	public void setProductNo(int productNo) {
 		this.productNo = productNo;
 	}
 

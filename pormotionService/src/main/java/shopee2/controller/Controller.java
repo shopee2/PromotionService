@@ -65,7 +65,7 @@ public class Controller {
 			*/
 			p.setId(doc.getLong("id").intValue());
 			p.setDesc(doc.getString("desc"));
-			p.setProductNo(doc.getString("productNo"));
+			p.setProductNo(doc.getLong("productNo").intValue());
 			p.setForShopID(doc.getString("forShopID"));
 			p.setCreatorID(doc.getString("creatorID"));
 			p.setActive(doc.getBoolean("active"));
@@ -257,7 +257,7 @@ public class Controller {
 		
 		Promotion p =  promotionList.get(0);
 		p.setDesc(promotion.getDesc()!=null?promotion.getDesc():p.getDesc());
-		p.setProductNo(promotion.getProductNo()!=null?promotion.getProductNo():p.getProductNo());
+		p.setProductNo(promotion.getProductNo()!=0?promotion.getProductNo():p.getProductNo());
 		p.setForShopID(promotion.getForShopID()!=null?promotion.getForShopID():p.getForShopID());
 		p.setCreatorID(promotion.getCreatorID()!=null?promotion.getCreatorID():p.getCreatorID());
 		p.setActive(promotion.getActive()!=null?promotion.getActive():p.getActive());
