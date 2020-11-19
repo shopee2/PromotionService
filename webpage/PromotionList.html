@@ -46,7 +46,7 @@
         class="container-fluid"
         style="margin-top: 15px; margin-bottom: 15px display: inline;"
       >
-          <button class="btn btn-outline-success mr-2" type="button" data-toggle="modal" data-target="#registerModal">
+          <button class="btn btn-outline-light mr-2" type="button" data-toggle="modal" data-target="#registerModal">
             เพิ่มโปรโมชั่น
           </button>
         </a>
@@ -56,6 +56,10 @@
           <button class="btn btn-secondary mr-2" type="submit" onclick=callPromotion(true)>
             โปรส่งฟรี
           </button>
+          
+          <input type="date" class="search_date"/>
+          <button type="submit" class="btn btn-info" value="submit" onclick=clearDate()>ล้าง</button>
+          <button type="submit" class="btn btn-success" value="submit" onclick=callPromotion()>ค้นหา</button>
       </div>
       <div
         class="container-fluid"
