@@ -171,11 +171,8 @@ public class Controller {
 				status.put( "description", "Valid code" );
 				status.put( "promotion", promotionList.get(0));
 				
-				//return new ObjectMapper().writeValueAsString(promotionList.get(0));
 				return status;
-				//new ObjectMapper().writeValueAsString(Promotion)
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

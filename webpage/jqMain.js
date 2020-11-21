@@ -1,4 +1,33 @@
 //var zone
+var promoData = []
+var Product = []
+var fuse = ""
+
+var dummy_data_product = [
+  {
+    id: 1,
+    name: "Tesla Model X",
+    description: "Electric car",
+    imageUrl: "url",
+    weight: 999,
+    price: 3099.99,
+    stock: 100,
+    shopId: 35,
+    categoryId: 39,
+  },
+  {
+    id: 2,
+    name: "Tesla Model Y",
+    description: "Electric car",
+    imageUrl: "url",
+    weight: 999,
+    price: 2099.99,
+    stock: 100,
+    shopId: 35,
+    categoryId: 39,
+  },
+];
+
 
 $(document).ready(function () {
 
@@ -49,9 +78,11 @@ $(document).ready(function () {
         $("#registerModal").data("couponid");
       method = "PATCH";
     }
+    /*
     console.log("Before");
     console.log(url, method);
     console.log(data);
+    */
 
     $.ajax({
       url: url,
@@ -59,9 +90,7 @@ $(document).ready(function () {
       data: JSON.stringify(data),
       contentType: "application/json",
     }).then(function (data) {
-      console.log("RESPONSE");
       //ถ้าสำเร็จ
-      console.log(data);
       if (data["status"] == "success") {
         clearPromotion()
         callPromotion();
@@ -85,38 +114,16 @@ $(document).ready(function () {
 
   $("#registerModal").on("show.bs.modal", function (e) {
     console.log("open")
-    var dummy_data_product = [
-      {
-        id: 01,
-        name: "Tesla Model X",
-        description: "Electric car",
-        imageUrl: "url",
-        weight: 999,
-        price: 3099.99,
-        stock: 100,
-        shopId: 35,
-        categoryId: 39,
-      },
-      {
-        id: 02,
-        name: "Tesla Model Y",
-        description: "Electric car",
-        imageUrl: "url",
-        weight: 999,
-        price: 2099.99,
-        stock: 100,
-        shopId: 35,
-        categoryId: 39,
-      },
-    ];
     console.log(dummy_data_product)
+
+    var option = "";
+    option +=   "<option value=-1>ทั้งหมด</option>";
+
     $.each(dummy_data_product, function (index, value) {
       console.log(index)
-      var option = "";
-      option +=
-        "<option value='" + value["id"] + "'>" + value["name"] + "</option>";
-      $(".selectProduct").append(option);
-    });
+      option += "<option value=" + value["id"] + ">" + value["name"] + "</option>";
+    }
+    );
     /*
       $.ajax({
           url: 'http://stock.phwt.me/product',
@@ -131,12 +138,32 @@ $(document).ready(function () {
         });
       })
     */
-
+   $(".selectProduct").append(option);
   });
+
+  $(".search").keyup(function (e){
+    // Change the pattern
+    const pattern = e.target.value
+
+    //deletePros()
+    if (pattern !== ""){
+    const search = fuse.search(pattern)
+    let data = []
+    search.map(function(value){
+      data.push(value.item)
+    })
+      console.log(data)
+      renderPromotion(data)
+    }
+    else{
+      renderPromotion(promoData)
+    }
+})
+  
 });
 
-function swapPros(id, active, free) {
-  $.ajax({
+async function swapPros(id, active, free) {
+  await $.ajax({
     url: "http://localhost:8089/promotions/edit/" + id,
     type: "PATCH",
     data: JSON.stringify({ active: !active }),
@@ -155,6 +182,7 @@ function deletePros(id) {
   }).then(
     setTimeout(function (data) {
       setTimeout(callPromotion());
+      promoData = data['promotion']
       clearPromotion()
     }, 500)
   );
@@ -172,16 +200,18 @@ function freeDeli(checkbox) {
   }
 }
 
-function editPros(id, active) {
-  $.ajax({
+async function editPros(id, active) {
+  await $.ajax({
     url: "http://localhost:8089/promotions/id/" + id,
     type: "GET",
   }).then(function (data) {
     var promotion = data["promotion"];
+    promoData = data["promotion"];
     console.log($("#freeDeliCheck").val());
     $("#registerModal").modal("toggle");
     $("#freeDeliCheck").prop("checked", promotion["isFreeDelivery"]);
     $("#type").get(0).selectedIndex = promotion["active"] ? 0 : 1;
+    $('#selectProduct[value="1"]').prop("selected",true);
     $("#discountCode").val(promotion["code"]);
     $("#couponDesc").val(promotion["desc"]);
     $("#minPrice").val(promotion["minimumPrice"]);
@@ -253,10 +283,36 @@ async function callPromotion(free) {
   await $.ajax({
     url: url,
   }).then(function (data) {
-    console.log(data);
-    renderPromotion(data, free);
+    promoData = data["promotion"];
+    console.log(promoData);
+    renderPromotion(promoData, free);
+    const options = {
+      isCaseSensitive: false,
+     // includeScore: false,
+     // shouldSort: true,
+     // includeMatches: false,
+     // findAllMatches: false,
+     // minMatchCharLength: 1,
+     // location: 0,
+     // threshold: 0.6,
+     // distance: 100,
+     // useExtendedSearch: false,
+     // ignoreLocation: false,
+     // ignoreFieldNorm: false,
+     keys: [
+       "desc",
+       "code",
+     ]
+   };
+   
+   fuse = new Fuse(promoData, options);
+   
   });
+  /*
+  เรียกโปร
+  */
 }
+
 
 function clearPromotion() {
   $(".cardCont").empty();
@@ -272,13 +328,14 @@ function renderbyfilter(data) {
 }
 
 function renderPromotion(data, free) {
-  $.each(data["promotion"], function (index, value) {
+  clearPromotion()
+  $.each(data, function (index, value) {
     var card = "";
     card +=
       "<div class='col-lg-3  ml-5 mb-2'><div class='card cardInstant rounded-10 ' style='width:100%'>";
     card += "<div class='card-header bg-warning'>"
     if (value.desc != null) {
-      card += '<h5 class="card-text">' + value.desc + "</h5>";
+      card += '<h5 class="card-text proDesc">' + value.desc + "</h5>";
     } else {
       card += '<h5 class="card-text">ไม่มีคำอธิบาย</h5>';
     }
@@ -338,10 +395,13 @@ function renderPromotion(data, free) {
     card += "</div></div>";
     //ค้นหาวันที่เริ่มต้นใช้คูปอง
     let a = document.querySelector('.search_date')
-    if (a.value === value.startDate.slice(0, 10) || a.value === "") {
+    if (new Date(a.value).toDateString() === new Date(value.startDate).toDateString()|| a.value === "") {
       $(".cardCont").append(card);
+      
     }
-    console.log("MY", a.value)
-    console.log(value.startDate.slice(0, 10))
+    
   });
+
+  clearDate()
+  
 }
