@@ -4,6 +4,7 @@ var Product = [];
 var fuse = "";
 
 var dummy_data_product = [
+  /*
   {
     id: 1,
     name: "Tesla Model X",
@@ -26,6 +27,7 @@ var dummy_data_product = [
     shopId: 35,
     categoryId: 39,
   },
+  */
 ];
 
 $(document).ready(function () {
@@ -178,7 +180,6 @@ function deletePros(id) {
   }).then(
     setTimeout(function (data) {
       setTimeout(callPromotion());
-      promoData = data["promotion"];
       clearPromotion();
     }, 500)
   );
@@ -271,28 +272,37 @@ function clearModal() {
   $("#usedCodeError").css("display", "none");
 }
 
-function callPromotion(free) {
+async function callPromotion(free) {
   clearPromotion();
   //console.log(free)
   var url = free
     ? "http://localhost:8089/promotions/freeDelivery"
     : "http://localhost:8089/promotions";
-  $.ajax({
+  await $.ajax({
     url: url,
-    dataType: "json"
+    contentType: "application/json",
   }).then(function (data) {
     promoData = data["promotion"];
-    //console.log(promoData);
+    console.log(promoData);
   });
-  /*
+  
   await $.ajax({
     url: 'http://stock.phwt.me/product',
-  }).then(function (data) {
-    //promoData = data["promotion"];
-    console.log(data);
-    renderPromotion(promoData, free);
-  });
-  */
+    dataType: 'json', // Notice! JSONP <-- P (lowercase)
+    header:{
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers' : 'Origin, X-Requested-With, Content-Type, Accept'
+
+    },
+    success:function(json){
+        // do stuff with json (in this case an array)
+        dummy_data_product = json
+
+    },
+    error:function(){
+    }      
+});
+  
   renderPromotion(promoData, free);
     const options = {
       isCaseSensitive: false,
@@ -343,6 +353,8 @@ function renderPromotion(data, free) {
     card += "</div><div class='card-body'>";
 
     const findProduct = dummy_data_product.findIndex(element => element.id == value.productNo)
+    console.log(dummy_data_product)
+    console.log(findProduct)
     productText =
       findProduct >= 0 
         ? dummy_data_product[findProduct].name
@@ -403,12 +415,10 @@ function renderPromotion(data, free) {
     card += "</div></div>";
     //ค้นหาวันที่เริ่มต้นใช้คูปอง
     let a = document.querySelector(".search_date");
-    if (
-      new Date(a.value).toDateString() ===
-        new Date(value.startDate).toDateString() ||
-      a.value === ""
-    ) {
+
+    if (((new Date(value.startDate) <= new Date(a.value)) && (new Date(a.value) <= new Date(value.dueDate))) || a.value === "") {
       $(".cardCont").append(card);
+      
     }
   });
 

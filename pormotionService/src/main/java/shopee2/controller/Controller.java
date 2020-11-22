@@ -1,6 +1,7 @@
 package shopee2.controller;
 
 import java.util.ArrayList;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,7 @@ import com.google.gson.JsonObject;
 
 import shopee2.model.Promotion;
 import shopee2.pormotionService.FirebaseInit;
+
 
 @CrossOrigin
 @ComponentScan(basePackages="shopee2.pormotionService")
@@ -93,7 +95,7 @@ public class Controller {
 		System.out.println("recieve data");
 		ApiFuture<QuerySnapshot> querySnapshot= Promotion.get();
 		
-		promotionList = docToList(promotionList, querySnapshot);
+		promotionList = docToList(promotionList, querySnapshot); 
 		Map<String, Object> status = new HashMap<String, Object>();
 		status.put( "status", "success" );
 		status.put( "description", "get all promotion success" );
