@@ -293,16 +293,16 @@ public class Controller {
 	}
 	
 	@RequestMapping(value = "/promotions/delete/{id}", method = RequestMethod.DELETE)
-	public String deletePromotion(@PathVariable String id) throws InterruptedException, ExecutionException, JsonProcessingException {
+	public Map<String, Object> deletePromotion(@PathVariable String id) throws InterruptedException, ExecutionException, JsonProcessingException {
 		
 		CollectionReference PromotionGet= db.getFireBase().collection("promotion");
 		System.out.println("recieve data");
 		ApiFuture<WriteResult> querySnapshot = PromotionGet.document(id).delete();
 		
-		Map<String, String> status = new HashMap<String, String>();
+		Map<String, Object> status = new HashMap<String, Object>();
 		status.put( "status", "success" );
 		status.put( "description", "Delete promotion successfully" );
 		
-		return new ObjectMapper().writeValueAsString(status);
+		return status;
 	}
 }

@@ -1,7 +1,7 @@
 //var zone
-var promoData = []
-var Product = []
-var fuse = ""
+var promoData = [];
+var Product = [];
+var fuse = "";
 
 var dummy_data_product = [
   {
@@ -28,24 +28,22 @@ var dummy_data_product = [
   },
 ];
 
-
 $(document).ready(function () {
-
   callPromotion();
   //when submit register/edit form
   $("#regisForm").submit(function (e) {
     e.preventDefault();
     //console.log("nah")
     var serializedForm = $("#regisForm").serializeJSON();
-    console.log(serializedForm)
+    console.log(serializedForm);
     var disBaht =
       serializedForm["discountBaht"] === undefined ||
-        serializedForm["discountBaht"] === ""
+      serializedForm["discountBaht"] === ""
         ? 0
         : parseFloat(serializedForm["discountBaht"]);
     var disPer =
       serializedForm["discountPercent"] === undefined ||
-        serializedForm["discountPercent"] === ""
+      serializedForm["discountPercent"] === ""
         ? 0
         : parseFloat(serializedForm["discountPercent"]);
     var data = {
@@ -53,7 +51,7 @@ $(document).ready(function () {
       forShopID: "-1",
       creatorID: "-1",
 
-      //  productNo: parseInt(serializedForm["product"]),
+      productNo: parseInt(serializedForm["product"]),
       active: serializedForm["type"] == "active",
       code: serializedForm["discountCode"],
       startDate: new Date(serializedForm["startDate"]).toISOString(),
@@ -92,7 +90,7 @@ $(document).ready(function () {
     }).then(function (data) {
       //ถ้าสำเร็จ
       if (data["status"] == "success") {
-        clearPromotion()
+        clearPromotion();
         callPromotion();
         console.log("OK");
         $("#registerModal").data("registerModalState", "regis");
@@ -108,22 +106,22 @@ $(document).ready(function () {
 
   $("#registerModal").on("hidden.bs.modal", function (e) {
     clearModal();
-    $(".selectProduct").empty()
+    $(".selectProduct").empty();
     $("#registerModal").data("registerModalState", "regis");
   });
 
   $("#registerModal").on("show.bs.modal", function (e) {
-    console.log("open")
-    console.log(dummy_data_product)
+    console.log("open");
+    console.log(dummy_data_product);
 
     var option = "";
-    option +=   "<option value=-1>ทั้งหมด</option>";
+    option += "<option value=-1>ทั้งหมด</option>";
 
     $.each(dummy_data_product, function (index, value) {
-      console.log(index)
-      option += "<option value=" + value["id"] + ">" + value["name"] + "</option>";
-    }
-    );
+      console.log(index);
+      option +=
+        "<option value=" + value["id"] + ">" + value["name"] + "</option>";
+    });
     /*
       $.ajax({
           url: 'http://stock.phwt.me/product',
@@ -138,28 +136,26 @@ $(document).ready(function () {
         });
       })
     */
-   $(".selectProduct").append(option);
+    $(".selectProduct").append(option);
   });
 
-  $(".search").keyup(function (e){
+  $(".search").keyup(function (e) {
     // Change the pattern
-    const pattern = e.target.value
+    const pattern = e.target.value;
 
     //deletePros()
-    if (pattern !== ""){
-    const search = fuse.search(pattern)
-    let data = []
-    search.map(function(value){
-      data.push(value.item)
-    })
-      console.log(data)
-      renderPromotion(data)
+    if (pattern !== "") {
+      const search = fuse.search(pattern);
+      let data = [];
+      search.map(function (value) {
+        data.push(value.item);
+      });
+      console.log(data);
+      renderPromotion(data);
+    } else {
+      renderPromotion(promoData);
     }
-    else{
-      renderPromotion(promoData)
-    }
-})
-  
+  });
 });
 
 async function swapPros(id, active, free) {
@@ -182,8 +178,8 @@ function deletePros(id) {
   }).then(
     setTimeout(function (data) {
       setTimeout(callPromotion());
-      promoData = data['promotion']
-      clearPromotion()
+      promoData = data["promotion"];
+      clearPromotion();
     }, 500)
   );
 }
@@ -211,7 +207,7 @@ async function editPros(id, active) {
     $("#registerModal").modal("toggle");
     $("#freeDeliCheck").prop("checked", promotion["isFreeDelivery"]);
     $("#type").get(0).selectedIndex = promotion["active"] ? 0 : 1;
-    $('#selectProduct[value="1"]').prop("selected",true);
+    $('#selectProduct[value="1"]').prop("selected", true);
     $("#discountCode").val(promotion["code"]);
     $("#couponDesc").val(promotion["desc"]);
     $("#minPrice").val(promotion["minimumPrice"]);
@@ -258,7 +254,7 @@ async function editPros(id, active) {
     */
 }
 
-function clearPromotion(){
+function clearPromotion() {
   $(".cardCont").empty();
 }
 
@@ -276,7 +272,8 @@ function clearModal() {
 }
 
 async function callPromotion(free) {
-  clearPromotion()
+  clearPromotion();
+  //console.log(free)
   var url = free
     ? "http://localhost:8089/promotions/freeDelivery"
     : "http://localhost:8089/promotions";
@@ -284,62 +281,72 @@ async function callPromotion(free) {
     url: url,
   }).then(function (data) {
     promoData = data["promotion"];
-    console.log(promoData);
+    //console.log(promoData);
+  });
+  /*
+  await $.ajax({
+    url: 'http://stock.phwt.me/product',
+  }).then(function (data) {
+    //promoData = data["promotion"];
+    console.log(data);
     renderPromotion(promoData, free);
+  });
+  */
+  renderPromotion(promoData, free);
     const options = {
       isCaseSensitive: false,
-     // includeScore: false,
-     // shouldSort: true,
-     // includeMatches: false,
-     // findAllMatches: false,
-     // minMatchCharLength: 1,
-     // location: 0,
-     // threshold: 0.6,
-     // distance: 100,
-     // useExtendedSearch: false,
-     // ignoreLocation: false,
-     // ignoreFieldNorm: false,
-     keys: [
-       "desc",
-       "code",
-     ]
-   };
-   
-   fuse = new Fuse(promoData, options);
-   
-  });
+      // includeScore: false,
+      // shouldSort: true,
+      // includeMatches: false,
+      // findAllMatches: false,
+      // minMatchCharLength: 1,
+      // location: 0,
+       threshold: 0.2,
+       distance: 1000,
+      // useExtendedSearch: true,
+      // ignoreLocation: false,
+      // ignoreFieldNorm: false,
+      keys: ["desc", "code"],
+    };
+
+    fuse = new Fuse(promoData, options);
   /*
   เรียกโปร
   */
 }
-
 
 function clearPromotion() {
   $(".cardCont").empty();
 }
 
 function clearDate() {
-  $(".search_date").val('');
+  $(".search_date").val("");
 }
 
 function renderbyfilter(data) {
-  $.each(data["promotion"], function (index, value) {
-  })
+  $.each(data["promotion"], function (index, value) {});
 }
 
 function renderPromotion(data, free) {
-  clearPromotion()
+  clearPromotion();
   $.each(data, function (index, value) {
     var card = "";
     card +=
-      "<div class='col-lg-3  ml-5 mb-2'><div class='card cardInstant rounded-10 ' style='width:100%'>";
-    card += "<div class='card-header bg-warning'>"
+      "<div class='col-lg-3 ml-5 mt-1   mb-2'><div class='card cardInstant rounded-10 ' style='width:100%'>";
+    card += "<div class='card-header bg-warning'>";
     if (value.desc != null) {
       card += '<h5 class="card-text proDesc">' + value.desc + "</h5>";
     } else {
       card += '<h5 class="card-text">ไม่มีคำอธิบาย</h5>';
     }
-    card += "</div><div class='card-body'>"
+    card += "</div><div class='card-body'>";
+
+    const findProduct = dummy_data_product.findIndex(element => element.id == value.productNo)
+    productText =
+      findProduct >= 0 
+        ? dummy_data_product[findProduct].name
+        : "ทั้งหมด";
+    card += '<h5 class="card-text">ลดสินค้า : ' + productText + "</h5>";
     card += '<h5 class="card-text">Code : ' + value.code + "</h5>";
     card +=
       '<h5 class="card-text">Start : ' +
@@ -394,14 +401,15 @@ function renderPromotion(data, free) {
       ')">Delete</button>';
     card += "</div></div>";
     //ค้นหาวันที่เริ่มต้นใช้คูปอง
-    let a = document.querySelector('.search_date')
-    if (new Date(a.value).toDateString() === new Date(value.startDate).toDateString()|| a.value === "") {
+    let a = document.querySelector(".search_date");
+    if (
+      new Date(a.value).toDateString() ===
+        new Date(value.startDate).toDateString() ||
+      a.value === ""
+    ) {
       $(".cardCont").append(card);
-      
     }
-    
   });
 
-  clearDate()
-  
+  clearDate();
 }
