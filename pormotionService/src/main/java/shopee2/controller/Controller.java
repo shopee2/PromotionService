@@ -62,7 +62,7 @@ public class Controller {
 	
 	
 	
-	@RequestMapping(value = "/promotions", method=RequestMethod.GET)
+	@RequestMapping(value = "/promotions", method=RequestMethod.GET, produces = "application/json")
 	public Map<String, Object> getPromotion() throws JsonProcessingException, InterruptedException, ExecutionException{
 		Map<String, Object> status = promotionService.getPromotion();
 		return status;
@@ -71,14 +71,14 @@ public class Controller {
 	}
 	
 	
-	@RequestMapping(value = "/promotions/freeDelivery", method=RequestMethod.GET)
+	@RequestMapping(value = "/promotions/freeDelivery", method=RequestMethod.GET, produces = "application/json")
 	public Map<String, Object> getPromotionFreeDelivery() throws InterruptedException, ExecutionException {
 		Map<String, Object> status = promotionService.getPromotionFreeDelivery();
 		return status;
 
 	}
 	
-	@RequestMapping(value = "/promotions/id/{id}", method=RequestMethod.GET)
+	@RequestMapping(value = "/promotions/id/{id}", method=RequestMethod.GET, produces = "application/json")
 	public Map<String, Object> getPromotionFreeDelivery (@PathVariable int id ) throws InterruptedException, ExecutionException {
 		Map<String, Object> status = promotionService.getPromotion(id);
 
@@ -88,7 +88,7 @@ public class Controller {
 
 	}
 	
-	@RequestMapping(value = "/promotions/{code}", method=RequestMethod.GET)
+	@RequestMapping(value = "/promotions/{code}", method=RequestMethod.GET, produces = "application/json")
 	public Map<String, Object> getPromotionCodeMatch(@PathVariable String code) throws InterruptedException, ExecutionException, JsonProcessingException {
 		Map<String, Object> status = promotionService.getPromotionCodeMatch(code);
 		return status;
@@ -96,13 +96,13 @@ public class Controller {
 	}
 
 	
-	@RequestMapping(value = "/promotions", method=RequestMethod.POST)
+	@RequestMapping(value = "/promotions", method=RequestMethod.POST, produces = "application/json")
 	public Map<String, Object> addPromotion(@RequestBody Promotion promotion) throws InterruptedException, ExecutionException, JsonProcessingException {
 		
 		Map<String, Object> status = promotionService.addPromotion(promotion);
 		return status;
 	}
-	@RequestMapping(value = "/promotions/edit/{id}", method=RequestMethod.PATCH)
+	@RequestMapping(value = "/promotions/edit/{id}", method=RequestMethod.PATCH, produces = "application/json")
 	public Map<String, Object> updatePromotion(@RequestBody Promotion promotion, @PathVariable int id) throws InterruptedException, ExecutionException, JsonProcessingException {		
 		Map<String, Object> status = promotionService.updatePromotion(promotion, id);
 		return status;
@@ -110,7 +110,7 @@ public class Controller {
 		
 	}
 	
-	@RequestMapping(value = "/promotions/delete/{id}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/promotions/delete/{id}", method = RequestMethod.DELETE, produces = "application/json")
 	public Map<String, Object> deletePromotion(@PathVariable String id) throws InterruptedException, ExecutionException, JsonProcessingException {
 		Map<String, Object> status = promotionService.deletePromotion(id);
 		return status;
