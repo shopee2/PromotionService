@@ -37,7 +37,7 @@ $(document).ready(function () {
     e.preventDefault();
     //console.log("nah")
     var serializedForm = $("#regisForm").serializeJSON();
-    console.log(serializedForm);
+    //console.log(serializedForm);
     var disBaht =
       serializedForm["discountBaht"] === undefined ||
       serializedForm["discountBaht"] === ""
@@ -66,15 +66,15 @@ $(document).ready(function () {
     };
     //console.log(data)
 
-    console.log($("#registerModal").data("registermodalstate"));
+    //console.log($("#registerModal").data("registermodalstate"));
     var url = "";
     var method = "";
     if ($("#registerModal").data("registermodalstate") == "regis") {
-      url = "http://localhost:8089/promotions";
+      url = "https://mhee-promotion.herokuapp.com/promotions";
       method = "POST";
     } else if ($("#registerModal").data("registermodalstate") == "edit") {
       url =
-        "http://localhost:8089/promotions/edit/" +
+        "https://mhee-promotion.herokuapp.com/promotions/edit/" +
         $("#registerModal").data("couponid");
       method = "PATCH";
     }
@@ -94,11 +94,11 @@ $(document).ready(function () {
       if (data["status"] == "success") {
         clearPromotion();
         callPromotion();
-        console.log("OK");
+        //console.log("OK");
         $("#registerModal").data("registerModalState", "regis");
         $("#registerModal").modal("hide");
       } else if (data["status"] === "error") {
-        console.log("error");
+        //console.log("error");
         $("#usedCodeError").css("display", "inline-block");
       }
     });
@@ -113,14 +113,14 @@ $(document).ready(function () {
   });
 
   $("#registerModal").on("show.bs.modal", function (e) {
-    console.log("open");
-    console.log(dummy_data_product);
+    //console.log("open");
+    //console.log(dummy_data_product);
 
     var option = "";
     option += "<option value=-1>ทั้งหมด</option>";
 
     $.each(dummy_data_product, function (index, value) {
-      console.log(index);
+      //console.log(index);
       option +=
         "<option value=" + value["id"] + ">" + value["name"] + "</option>";
     });
@@ -152,7 +152,7 @@ $(document).ready(function () {
       search.map(function (value) {
         data.push(value.item);
       });
-      console.log(data);
+      //console.log(data);
       renderPromotion(data);
     } else {
       renderPromotion(promoData);
@@ -162,7 +162,7 @@ $(document).ready(function () {
 
 async function swapPros(id, active, free) {
   await $.ajax({
-    url: "http://localhost:8089/promotions/edit/" + id,
+    url: "https://mhee-promotion.herokuapp.com/promotions/edit/" + id,
     type: "PATCH",
     data: JSON.stringify({ active: !active }),
     contentType: "application/json",
@@ -175,7 +175,7 @@ async function swapPros(id, active, free) {
 
 function deletePros(id) {
   $.ajax({
-    url: "http://localhost:8089//promotions/delete/" + id,
+    url: "https://mhee-promotion.herokuapp.com/promotions/delete/" + id,
     type: "DELETE",
   }).then(
     setTimeout(function (data) {
@@ -199,12 +199,12 @@ function freeDeli(checkbox) {
 
 async function editPros(id, active) {
   await $.ajax({
-    url: "http://localhost:8089/promotions/id/" + id,
+    url: "https://mhee-promotion.herokuapp.com/promotions/id/" + id,
     type: "GET",
   }).then(function (data) {
     var promotion = data["promotion"];
     promoData = data["promotion"];
-    console.log($("#freeDeliCheck").val());
+    //console.log($("#freeDeliCheck").val());
     $("#registerModal").modal("toggle");
     $("#freeDeliCheck").prop("checked", promotion["isFreeDelivery"]);
     $("#type").get(0).selectedIndex = promotion["active"] ? 0 : 1;
@@ -276,14 +276,14 @@ async function callPromotion(free) {
   clearPromotion();
   //console.log(free)
   var url = free
-    ? "http://localhost:8089/promotions/freeDelivery"
-    : "http://localhost:8089/promotions";
+    ? "https://mhee-promotion.herokuapp.com/promotions/freeDelivery"
+    : "https://mhee-promotion.herokuapp.com/promotions";
   await $.ajax({
     url: url,
     contentType: "application/json",
   }).then(function (data) {
     promoData = data["promotion"];
-    console.log(promoData);
+    //console.log(promoData);
   });
   
   await $.ajax({
@@ -355,8 +355,8 @@ function renderPromotion(data, free) {
     card += "</div><div class='card-body'>";
 
     const findProduct = dummy_data_product.findIndex(element => element.id == value.productNo)
-    console.log(dummy_data_product)
-    console.log(findProduct)
+    //console.log(dummy_data_product)
+    //console.log(findProduct)
     productText =
       findProduct >= 0 
         ? dummy_data_product[findProduct].name
