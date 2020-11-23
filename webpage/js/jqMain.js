@@ -299,8 +299,10 @@ async function callPromotion(free) {
         dummy_data_product = json
 
     },
-    error:function(){
+    error:function(error){
     }      
+}).catch(function (err){
+  
 });
   
   renderPromotion(promoData, free);
