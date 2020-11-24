@@ -12,6 +12,9 @@ Service นี้ทำงานเกี่ยวกับการจัดก
 ##### Swagger : https://app.swaggerhub.com/apis/T42994/SOP_PromotionProject/1.0.0
 ####
 
+#### ภาพรวมของ Promotion Service
+![Image of Diagram](https://github.com/shopee2/PromotionService/blob/main/SOP-Promotion.png)
+
 วิธีการเริมService ในกรณีใช้ local variable
 1. Import Project
 2. แกไข appilcation.properties (ถ้าต้องการ)
